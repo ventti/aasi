@@ -1,0 +1,1593 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Aasi</title>
+  <!-- Favicon with donkey emoji -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🫏</text></svg>">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <!-- Bootstrap CSS -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+    crossorigin="anonymous"
+  />
+  <style>
+    :root {
+      --overlay: rgba(0,0,0,.45);
+    }
+    html, body {
+      height: 100%;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 12px;
+      line-height: 1.6;
+      text-transform: uppercase;
+    }
+    body {
+      background: linear-gradient(135deg, #50ff50 0%, #40ff40 50%, #30ff30 100%);
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Animated soccer ball background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 120%;
+      height: 120%;
+      background-image:
+        repeating-linear-gradient(
+          45deg,
+          transparent,
+          transparent 80px,
+          rgba(255, 255, 255, 0.1) 80px,
+          rgba(255, 255, 255, 0.1) 160px
+        );
+      z-index: -2;
+      animation: moveBackground 40s linear infinite;
+    }
+
+    /* Create the emoji matrix container */
+    .emoji-matrix {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: max(150vw, 150vh);
+      height: max(150vw, 150vh);
+      transform: translate(-50%, -50%);
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      grid-template-rows: repeat(8, 1fr);
+      gap: 4px;
+      opacity: 0.2;
+      z-index: -1;
+      animation: rotateMatrix 120s linear infinite;
+      pointer-events: none;
+    }
+
+    /* Individual emoji cells */
+    .emoji-cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: max(12vw, 12vh);
+      line-height: 0.8;
+      animation: rotateIcon 16s linear infinite;
+      /*text-shadow: 0 0 0px rgba(0,0,0,0.3);*/
+      /* Fix emoji vertical alignment */
+      vertical-align: top;
+      text-align: center;
+      padding: 0;
+      margin: 0;
+      /* Force emoji to center properly */
+      height: 100%;
+      width: 100%;
+      position: relative;
+      top: -0.1em;
+    }
+
+    /* Offset every other row for staggered effect */
+    .emoji-cell:nth-child(8n+1),
+    .emoji-cell:nth-child(8n+2),
+    .emoji-cell:nth-child(8n+3),
+    .emoji-cell:nth-child(8n+4),
+    .emoji-cell:nth-child(8n+5),
+    .emoji-cell:nth-child(8n+6),
+    .emoji-cell:nth-child(8n+7),
+    .emoji-cell:nth-child(8n+8) {
+      animation-delay: calc(var(--row) * -0.5s);
+    }
+
+    /* Stagger the rotation for checkerboard pattern */
+    .emoji-cell:nth-child(odd) {
+      animation-delay: calc(var(--delay) * 1s);
+    }
+
+    .emoji-cell:nth-child(even) {
+      animation-delay: calc(var(--delay) * 1s + 2s);
+    }
+
+    @keyframes moveBackground {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(-80px, -80px); }
+    }
+
+    @keyframes rotateMatrix {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    @keyframes rotateIcon {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .bg-overlay {
+      background: var(--overlay);
+      min-height: 100vh;
+    }
+    .card-glass {
+      background: linear-gradient(175deg,
+        rgba(134, 139, 134, 0.75) 0%,    /* Forest Green */
+        rgba(255, 255, 255, 0.75) 50%, /* White */
+        rgba(34, 139, 34, 0.75) 100%); /* Forest Green */
+      backdrop-filter: blur(4px);
+      border: 0;
+      box-shadow: 0 10px 30px rgba(0,0,0,.2);
+      position: relative;
+    }
+    .card-glass::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(45deg,
+        rgba(34, 139, 34, 0.1) 0%,     /* Light green accent */
+        rgba(255, 255, 255, 0.1) 25%,  /* Light white accent */
+        rgba(34, 139, 34, 0.1) 50%,    /* Light green accent */
+        rgba(255, 255, 255, 0.1) 75%,  /* Light white accent */
+        rgba(34, 139, 34, 0.1) 100%);  /* Light green accent */
+      border-radius: inherit;
+      z-index: -1;
+    }
+
+    /* Status bar styling */
+    .status-bar {
+      background: linear-gradient(45deg, #0b0651, #3017d0) !important; /* Vivid magenta */
+      color: white !important;
+      margin: -1.5rem -1.5rem 1.5rem -1.5rem; /* Negative margins to extend to card edges */
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.375rem 0.375rem 0 0; /* Rounded top corners only */
+      box-shadow: 0 2px 4px rgba(212, 55, 138, 0.3);
+      font-weight: bold;
+    }
+
+    @media (min-width: 768px) {
+      .status-bar {
+        margin: -2.5rem -2.5rem 2.5rem -2.5rem; /* Larger negative margins for md+ screens */
+        padding: 0.75rem 2.5rem;
+      }
+    }
+    .name-input { max-width: 520px; }
+    .monoslot { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Liberation Mono", "Courier New", monospace; }
+    .queue-item { min-width: 140px; }
+    .cursor-help { cursor: help; }
+
+    /* Gamey vivid colors */
+    .badge-kicker {
+      background: linear-gradient(45deg, #00ff88, #00cc6a) !important;
+      color: #000 !important;
+      font-weight: bold;
+      box-shadow: 0 2px 4px rgba(0,255,136,0.3);
+    }
+    .badge-queue {
+      background: linear-gradient(45deg, #3366ff, #0044cc) !important;
+      color: #fff !important;
+      font-weight: bold;
+      box-shadow: 0 2px 4px rgba(51,102,255,0.3);
+    }
+    .badge-goalkeeper {
+      background: linear-gradient(45deg, #f4bc4b, #ff8800) !important;
+      color: #000 !important;
+      font-weight: bold;
+      box-shadow: 0 2px 4px rgba(255,170,0,0.3);
+    }
+    .badge-eliminated {
+      background: linear-gradient(45deg, #ff3366, #cc0033) !important;
+      color: #fff !important;
+      font-weight: bold;
+      box-shadow: 0 2px 4px rgba(255,51,102,0.3);
+    }
+
+    /* Override Bootstrap colors with vibrant gamey colors */
+    .btn-primary {
+      background: linear-gradient(45deg, #3366ff, #0044cc) !important;
+      border: none !important;
+      color: #fff !important;
+      font-weight: bold !important;
+      box-shadow: 0 4px 8px rgba(51,102,255,0.3) !important;
+      transition: all 0.2s ease !important;
+    }
+    .btn-primary:hover, .btn-primary:focus, .btn-primary:active {
+      background: linear-gradient(45deg, #0044cc, #002288) !important;
+      transform: translateY(-2px) !important;
+      box-shadow: 0 6px 12px rgba(51,102,255,0.4) !important;
+      color: #fff !important;
+    }
+
+    .btn-outline-primary {
+      border: 2px solid #3366ff !important;
+      color: #3366ff !important;
+      font-weight: bold !important;
+      background-color: #d0d1d3 !important;
+      transition: all 0.2s ease !important;
+    }
+    .btn-outline-primary:hover, .btn-outline-primary:focus, .btn-outline-primary:active {
+      background: linear-gradient(45deg, #3366ff, #0044cc) !important;
+      border-color: #3366ff !important;
+      color: #fff !important;
+      transform: translateY(-2px) !important;
+      box-shadow: 0 4px 8px rgba(51,102,255,0.3) !important;
+    }
+
+    .btn-secondary {
+      background: linear-gradient(45deg, #6c757d, #495057) !important; /* Gray metallic */
+      border: none !important;
+      color: #fff !important;
+      font-weight: bold !important;
+      box-shadow: 0 4px 8px rgba(108,117,125,0.3) !important;
+      transition: all 0.2s ease !important;
+    }
+    .btn-secondary:hover, .btn-secondary:focus, .btn-secondary:active {
+      background: linear-gradient(45deg, #495057, #343a40) !important;
+      transform: translateY(-2px) !important;
+      box-shadow: 0 6px 12px rgba(108,117,125,0.4) !important;
+      color: #fff !important;
+    }
+
+    .btn-outline-secondary {
+      border: 2px solid #6c757d !important;
+      color: #6c757d !important;
+      font-weight: bold !important;
+      background-color: #d0d1d3 !important;
+      transition: all 0.2s ease !important;
+    }
+    .btn-outline-secondary:hover, .btn-outline-secondary:focus, .btn-outline-secondary:active {
+      background: linear-gradient(45deg, #6c757d, #495057) !important;
+      border-color: #6c757d !important;
+      color: #fff !important;
+      transform: translateY(-2px) !important;
+      box-shadow: 0 4px 8px rgba(108,117,125,0.3) !important;
+    }
+
+    /* Gamey button styles */
+    .btn-goal {
+      background: linear-gradient(45deg, #00ff44, #00cc33) !important;
+      border: none !important;
+      color: #000 !important;
+      font-weight: bold !important;
+      box-shadow: 0 4px 8px rgba(0,255,68,0.3) !important;
+      transition: all 0.2s ease !important;
+    }
+    .btn-goal:hover {
+      background: linear-gradient(45deg, #00cc33, #009922) !important;
+      transform: translateY(-2px) !important;
+      box-shadow: 0 6px 12px rgba(0,255,68,0.4) !important;
+    }
+
+    .btn-miss {
+      background: linear-gradient(45deg, #ff6673, #cc2233) !important;
+      border: none !important;
+      color: #fff !important;
+      font-weight: bold !important;
+      box-shadow: 0 4px 8px rgba(255,68,85,0.3) !important;
+      transition: all 0.2s ease !important;
+    }
+    .btn-miss:hover {
+      background: linear-gradient(45deg, #cc2233, #991122) !important;
+      transform: translateY(-2px) !important;
+      box-shadow: 0 6px 12px rgba(255,68,85,0.4) !important;
+    }
+
+    /* Modal content reverts to normal font */
+    .modal-content {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      text-transform: none;
+    }
+
+    /* Double size for J-mode checkbox */
+    #jMode {
+      transform: scale(2);
+      margin-right: 0.5rem;
+    }
+
+    /* Fix vertical alignment for the checkbox container */
+    .form-check {
+      display: flex;
+      align-items: center;
+    }
+
+    /* Center the label text with the enlarged checkbox */
+    .form-check-label[for="jMode"] {
+      line-height: 1;
+      margin-top: 0;
+    }
+
+    /* Clear button styling */
+    .input-group .btn-outline-secondary {
+      background-color: #f8f9fa !important;
+      border-color: #dee2e6 !important;
+      color: #6c757d !important;
+    }
+    .input-group .btn-outline-secondary:hover,
+    .input-group .btn-outline-secondary:focus,
+    .input-group .btn-outline-secondary:active {
+      background-color: #e9ecef !important;
+      border-color: #adb5bd !important;
+      color: #495057 !important;
+    }
+
+    /* Swipe gesture animations */
+    .swipe-container {
+      position: relative;
+      touch-action: none; /* Handle all touch gestures manually */
+      min-height: 200px; /* Ensure adequate touch area */
+      user-select: none; /* Prevent text selection during swipes */
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+    }
+
+    .btn-swipe-goal {
+      transition: width 0.1s ease !important;
+      height: 80px !important; /* Double the normal button height */
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      overflow: hidden !important;
+    }
+
+    .btn-swipe-miss {
+      transition: width 0.1s ease !important;
+      height: 80px !important; /* Double the normal button height */
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      overflow: hidden !important;
+    }
+
+    /* Dynamic width classes that will be set via JavaScript */
+    .swipe-active .btn-swipe-goal,
+    .swipe-active .btn-swipe-miss {
+      transition: none !important; /* Remove transition during active swipe for immediate response */
+    }
+
+    /* Hide text when button gets too small, show only icons */
+    .btn-swipe-goal .btn-text,
+    .btn-swipe-miss .btn-text {
+      transition: opacity 0.2s ease !important;
+      white-space: nowrap !important;
+    }
+
+    .btn-swipe-goal.icon-only .btn-text,
+    .btn-swipe-miss.icon-only .btn-text {
+      opacity: 0 !important;
+    }
+
+    /* Add visual feedback for touch interaction
+    .swipe-container::after {
+      content: '← Swipe for Miss | Swipe for Goal →';
+      position: absolute;
+      bottom: 5px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 8px;
+      opacity: 0.6;
+      pointer-events: none;
+      white-space: nowrap;
+    }*/
+
+    @media (hover: hover) {
+      .swipe-container::after {
+        display: none; /* Hide on non-touch devices */
+      }
+    }
+
+    /* Swipe highlight effect for buttons */
+    .swipe-highlight {
+      background: rgb(255, 255, 0) !important;
+      transform: scale(2) !important;
+      transition: all 0.1s ease !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-overlay d-flex align-items-center py-5">
+    <div class="container">
+      <!-- SETUP PANEL -->
+      <div id="setupPanel" class="card card-glass mx-auto" style="max-width: 860px;">
+        <div class="card-body p-4 p-md-5">
+          <div class="status-bar d-flex justify-content-between align-items-center">
+            <h1 class="h1 mb-0">AASI</h1>
+            <div class="d-flex gap-2 align-items-center">
+              <button id="copySetupBtn" class="btn btn-outline-light btn-sm" type="button" title="Copy setup to clipboard">Copy</button>
+              <button type="button" class="btn btn-outline-light btn-sm" data-bs-toggle="modal" data-bs-target="#rulesModal">
+                Help
+              </button>
+            </div>
+          </div>
+          <div class="row g-3 align-items-end">
+            <div class="col-12 col-lg-6">
+              <label class="form-label" for="keyword">Keyword</label>
+              <input id="keyword" class="form-control" type="text" maxlength="40" value="AASI" />
+            </div>
+          </div>
+
+          <hr class="my-4" />
+              <label class="form-label" for="keyword">Players</label>
+          <div id="playerFields" class="name-input">
+            <!-- dynamic name inputs go here -->
+          </div>
+          <div class="d-flex gap-2 mt-3 align-items-center justify-content-between">
+            <div class="d-flex gap-2 align-items-center">
+              <button id="addPlayerBtn" class="btn btn-outline-primary" type="button">
+                + Add player
+              </button>
+              <button id="shuffleBtn" class="btn btn-outline-secondary" type="button">
+                Shuffle
+              </button>
+            </div>
+            <div class="form-check mb-0">
+              <input class="form-check-input" type="checkbox" id="jMode" />
+              <label class="form-check-label" for="jMode">
+                J-mode
+              </label>
+            </div>
+          </div>
+
+          <div class="d-grid mt-3">
+            <button id="playBtn" class="btn btn-goal btn-lg" type="button">PLAY!</button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- GAME PANEL -->
+      <div id="gamePanel" class="card card-glass mx-auto d-none" style="max-width: 1100px;">
+        <div class="card-body p-4 p-md-5">
+          <div class="status-bar d-flex flex-wrap gap-3 align-items-center justify-content-between">
+            <h2><span id="uiKeyword"></span></h2>
+            <button type="button" class="btn btn-outline-light btn-sm" data-bs-toggle="modal" data-bs-target="#rulesModal">
+              Help
+            </button>
+          </div>
+
+          <div class="row g-4">
+            <div class="col-12 col-lg-4">
+              <div id="gameControls" class="p-3 border rounded-3 h-100 swipe-container">
+                <div class="small">Current shootout</div>
+                <div id="uiKicker" class="fs-4 fw-semibold"></div>
+                vs.
+                <div id="uiKeeper" class="fs-4 fw-semibold"></div>
+                <div class="d-flex gap-1 mt-4">
+                  <button id="btnGoal" class="btn btn-goal btn-lg flex-fill btn-swipe-goal" type="button">
+                    <span class="btn-icon">⚽</span><span class="btn-text"> GOAL!</span>
+                  </button>
+                  <button id="btnMiss" class="btn btn-miss btn-lg flex-fill btn-swipe-miss" type="button">
+                    <span class="btn-icon">❌</span><span class="btn-text"> MISS!</span>
+                  </button>
+                </div>
+                <div class="d-grid mt-2">
+                  <button id="btnUndo" class="btn btn-outline-secondary" type="button">Oops!</button>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-lg-8">
+              <div class="p-3 border rounded-3 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <div class="small">Who's in the game</div>
+                  <div class="small">Active players: <span id="uiCount"></span></div>
+                </div>
+                <div id="uiAllPlayers" class="d-flex flex-wrap gap-2"></div>
+
+              </div>
+            </div>
+          </div>
+          <div class="d-grid mt-3">
+            <button id="btnQuit" class="btn btn-outline-secondary" type="button">Quit Game</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal for rules -->
+      <div class="modal fade" id="rulesModal" tabindex="-1" aria-labelledby="rulesModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="rulesModalLabel">AASI</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <blockquote class="blockquote">
+                <p>“The player was a jackass, and the football was just a football. And the god said it was good.”</p>
+              </blockquote>
+              <figcaption class="blockquote-footer">
+                From <cite title="Source Title">Genesis, 3:16</cite>
+              </figcaption>
+              <h5>Objective</h5>
+              <p>Be the last player standing. While a player is Goalie, each GOAL against them gives the next letter of the keyword (default AASI). When a Goalie completes the keyword, they are eliminated.</p>
+
+              <h5>Setup</h5>
+              <p>Real-life equipment needed: a ball and a goal. Probably some beer too.</p>
+              <p>Setup: Enter ≥2 names. Set the keyword if you like. Roles: first = Kicker, last = Goalkeeper. Others form the Kicker Queue. Press Play.</p>
+
+              <h5>Game</h5>
+              <ul>
+                <li>Kicker kicks the ball. This results either in GOAL or MISS</li>
+                <li>Goalie gains +1 letter if it is a GOAL</li>
+                <li>If the Goalie completes the keyword, they are eliminated</li>
+                <li>If it is a MISS, the Goalie is released to the end of the queue and the current Kicker becomes the new Goalie</li>
+                <li>The next player in the queue becomes the new Kicker</li>
+                <li>Players rotate roles until only one player remains</li>
+              </ul>
+              <h5>Winner</h5>
+              <p>The last remaining player wins</p>
+              <p>
+                Then choose Rematch (same players) or a New game
+              </p>
+              <h5>About</h5>
+              <p>
+                99% vibe-coded
+              </p>
+              <p>
+                This software is provided "as is" without warranty of any kind, express or implied. Use at your own risk.
+              </p>
+              <h5>License</h5>
+              <pre>
+           DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+                   Version 2, December 2004
+
+Copyright (C) 2004 Sam Hocevar <sam@hocevar.net>
+
+Everyone is permitted to copy and distribute verbatim or modified
+copies of this license document, and changing it is allowed as long
+as the name is changed.
+
+           DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+  TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
+
+ 0. You just DO WHAT THE FUCK YOU WANT TO.
+              </pre>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal for quit confirmation -->
+      <div class="modal fade" id="quitConfirmModal" tabindex="-1" aria-labelledby="quitConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="quitConfirmModalLabel">Really Quit?</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <p>Are you sure?</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Continue Playing</button>
+              <button type="button" class="btn btn-danger" id="confirmQuitBtn">Yes, Quit</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- END PANEL -->
+      <div id="endPanel" class="card card-glass mx-auto d-none" style="max-width: 860px;">
+        <div class="card-body p-4 p-md-5 text-center">
+          <div class="status-bar d-flex justify-content-center align-items-center">
+            <h2 class="mb-0">Game Over</h2>
+          </div>
+          <p class="lead"><span id="uiWinner" class="fw-bold"></span></p>
+          <div class="d-flex justify-content-center gap-2 mt-3">
+            <button id="rematchBtn" class="btn btn-primary" type="button">Rematch (same players)</button>
+            <button id="newgameBtn" class="btn btn-outline-secondary" type="button">New game</button>
+            <button id="copyUrlBtn" class="btn btn-outline-primary" type="button">Copy setup</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS (optional for some components) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+  <script>
+    // ---------- Data Model ----------
+    class Player {
+      constructor(name) {
+        this.name = name;
+        this.letters = 0; // how many letters collected as goalkeeper
+      }
+    }
+
+    class Game {
+      constructor() {
+        this.keyword = "AASI";
+        this.players = []; // active players
+        // runtime state
+        this.goalkeeper = null; // Player
+        this.kicker = null;     // Player
+        this.queue = [];        // Players waiting to kick
+      }
+      icons = {
+        goalkeeper: '🥅',
+        kicker: '⚽️',
+        queue: '🍺'
+      };
+      setup(keyword, names) {
+        this.keyword = (keyword || "AASI").toString();
+        this.players = names.map(n => new Player(n));
+        // Initial roles: first is kicker, last is goalkeeper, rest in between is queue
+        if (this.players.length < 2) throw new Error("Need at least two players.");
+        this.kicker = this.players[0];
+        this.goalkeeper = this.players[this.players.length - 1];
+        this.queue = this.players.slice(1, -1); // may be empty
+        this.allPlayers = [...this.players]; // keep all players for reference
+      }
+
+      // --- Helpers ---
+      roster() {
+        // Return array of active players in logical order (kicker, queue..., goalkeeper)
+        return [this.kicker, ...this.queue, this.goalkeeper];
+      }
+
+      dropouts() {
+        // Return array of players who have been eliminated (i.e., collected all letters)
+        return this.allPlayers.filter(p => this.isEliminated(p));
+      }
+
+      statusFor(player) {
+        // e.g., AASI -> A__ or AAS_
+        const filled = this.keyword.slice(0, player.letters);
+        const rest = this.keyword.length - player.letters;
+        return filled + (rest > 0 ? "_".repeat(rest) : "");
+      }
+
+      isEliminated(player) {
+        return player.letters >= this.keyword.length;
+      }
+
+      checkWinner() {
+        if (this.players.length === 1) {
+          return this.players[0];
+        }
+        return null;
+      }
+
+      // --- Core transitions ---
+      goal() {
+        // Kicker scored -> GK gains 1 letter
+        this.goalkeeper.letters += 1;
+
+        // Did that eliminate GK?
+        if (this.isEliminated(this.goalkeeper)) {
+          // Remove GK from active players entirely
+          this.players = this.players.filter(p => p !== this.goalkeeper);
+
+          // If only one left -> winner is the kicker
+          const winner = this.checkWinner();
+          if (winner) {
+            return { type: 'end', winner };
+          }
+
+          // Otherwise, rotate according to rules:
+          // 1) Kicker goes to end of queue
+          this.queue.push(this.kicker);
+          // 2) First-in-queue becomes new GK
+          this.goalkeeper = this.queue.shift();
+          // 3) Next first-in-queue becomes new Kicker
+          this.kicker = this.queue.shift();
+
+          // 4) Fix up players ordering: kicker + queue + GK
+          this.rebuildPlayersFromState();
+          return { type: 'rotate', reason: 'keeper_eliminated' };
+        }
+
+        // GK still in game -> kicker to end of queue, next becomes new kicker
+        this.queue.push(this.kicker);
+        this.kicker = this.queue.shift() || this.kicker; // if queue was empty, kicker remains (two-player loop)
+        this.rebuildPlayersFromState();
+        return { type: 'continue', reason: 'goal' };
+      }
+
+      miss() {
+        // Miss -> GK released to end of queue
+        this.queue.push(this.goalkeeper);
+        // Current kicker becomes the new GK
+        const prevKicker = this.kicker;
+        this.goalkeeper = prevKicker;
+        // Next player in queue becomes new kicker
+        this.kicker = this.queue.shift();
+        this.rebuildPlayersFromState();
+        return { type: 'continue', reason: 'miss' };
+      }
+
+      rebuildPlayersFromState() {
+        // Keep active list in order: kicker, queue..., goalkeeper
+        this.players = [this.kicker, ...this.queue, this.goalkeeper];
+      }
+
+      resetLetters() {
+        this.players.forEach(p => (p.letters = 0));
+      }
+
+      restartSamePlayers(newKeyword) {
+        const names = this.allPlayers.map(p => p.name);
+        this.keyword = newKeyword || this.keyword || "AASI";
+        this.players = names.map(n => new Player(n));
+        this.allPlayers = [...this.players]; // Reset allPlayers to the new Player objects
+        this.kicker = this.players[0];
+        this.goalkeeper = this.players[this.players.length - 1];
+        this.queue = this.players.slice(1, -1);
+      }
+    }
+
+    // ---------- UI Controller ----------
+    class UIController {
+      constructor() {
+        this.game = new Game();
+        this.previousGameState = null; // Store previous state for undo
+        // Setup refs
+        this.setupPanel = document.getElementById('setupPanel');
+        this.gamePanel = document.getElementById('gamePanel');
+        this.endPanel = document.getElementById('endPanel');
+
+
+        this.playerFields = document.getElementById('playerFields');
+        this.addPlayerBtn = document.getElementById('addPlayerBtn');
+        this.shuffleBtn = document.getElementById('shuffleBtn');
+        this.copySetupBtn = document.getElementById('copySetupBtn');
+        this.playBtn = document.getElementById('playBtn');
+
+        this.uiKeyword = document.getElementById('uiKeyword');
+        this.uiKicker = document.getElementById('uiKicker');
+        this.uiKeeper = document.getElementById('uiKeeper');
+        this.uiQueue = document.getElementById('uiQueue');
+        this.uiRoster = document.getElementById('uiRoster');
+        this.uiDropouts = document.getElementById('uiDropouts');
+        this.uiAllPlayers = document.getElementById('uiAllPlayers');
+        this.uiCount = document.getElementById('uiCount');
+
+        this.btnGoal = document.getElementById('btnGoal');
+        this.btnMiss = document.getElementById('btnMiss');
+        this.btnUndo = document.getElementById('btnUndo');
+        this.btnQuit = document.getElementById('btnQuit');
+        this.gameControls = document.getElementById('gameControls');
+
+        this.uiWinner = document.getElementById('uiWinner');
+        this.rematchBtn = document.getElementById('rematchBtn');
+        this.newgameBtn = document.getElementById('newgameBtn');
+        this.copyUrlBtn = document.getElementById('copyUrlBtn');
+        this.confirmQuitBtn = document.getElementById('confirmQuitBtn');
+
+        // Bind events
+        this.addPlayerBtn.addEventListener('click', () => this.addPlayerField());
+        this.shuffleBtn.addEventListener('click', () => this.shufflePlayers());
+        this.copySetupBtn.addEventListener('click', () => this.copySetupUrl());
+        this.playBtn.addEventListener('click', () => this.startGame());
+        this.btnGoal.addEventListener('click', () => this.onGoal());
+        this.btnMiss.addEventListener('click', () => this.onMiss());
+        this.btnUndo.addEventListener('click', () => this.onUndo());
+        this.btnQuit.addEventListener('click', () => this.showQuitConfirmation());
+        this.confirmQuitBtn.addEventListener('click', () => this.quitGame());
+        this.rematchBtn.addEventListener('click', () => this.rematch());
+        this.newgameBtn.addEventListener('click', () => this.resetAll());
+        this.copyUrlBtn.addEventListener('click', () => this.copyGameUrl());
+
+        // Add event listener for J-mode checkbox to update URL
+        document.getElementById('jMode').addEventListener('change', () => this.updateURL());
+
+        // Initialize swipe gestures for game controls
+        this.initializeNativeTouchGestures();
+
+        // Create the emoji matrix
+        this.createEmojiMatrix();
+
+        // Load from URL parameters and initialize
+        this.loadFromURL();
+
+        // Try to restore game state from localStorage
+        this.restoreGameState();
+      }
+
+      // ----- Swipe Gesture Handling -----
+      initializeNativeTouchGestures() {
+        if (!this.gameControls) return;
+
+        // Prevent multiple event listeners by removing existing ones
+        if (this.touchHandlersInitialized) return;
+        this.touchHandlersInitialized = true;
+
+        let startX = 0;
+        let startY = 0;
+        let isDown = false;
+        let gestureHandled = false; // Prevent duplicate gestures
+        let containerWidth = 0;
+        let goalBtn = null;
+        let missBtn = null;
+
+        this.gameControls.addEventListener('touchstart', (e) => {
+          isDown = true;
+          gestureHandled = false;
+          startX = e.touches[0].clientX;
+          startY = e.touches[0].clientY;
+
+          // Get button references and container width
+          goalBtn = this.btnGoal;
+          missBtn = this.btnMiss;
+          containerWidth = this.gameControls.querySelector('.d-flex').offsetWidth;
+
+          // Add active swipe class to disable transitions during gesture
+          this.gameControls.classList.add('swipe-active');
+        }, { passive: true });
+
+        this.gameControls.addEventListener('touchmove', (e) => {
+          if (!isDown) return;
+
+          const currentX = e.touches[0].clientX;
+          const currentY = e.touches[0].clientY;
+          const deltaX = currentX - startX;
+          const deltaY = currentY - startY;
+
+          // Prevent default behavior on horizontal swipes
+          if (Math.abs(deltaX) > Math.abs(deltaY)) {
+            e.preventDefault();
+
+            // Reset button highlights for vertical gestures
+            if (this.btnUndo) this.btnUndo.classList.remove('swipe-highlight');
+            if (this.btnQuit) this.btnQuit.classList.remove('swipe-highlight');
+
+            // Calculate progress based on finger position (0 to 1)
+            const maxSwipeDistance = containerWidth * 0.3; // 30% of container width for full effect
+            const progress = Math.max(0, Math.min(1, Math.abs(deltaX) / maxSwipeDistance));
+
+            // Calculate button widths based on swipe direction and progress
+            let goalWidth, missWidth;
+            const minWidth = 15; // Minimum width in percentage (smaller for icon-only)
+            const maxWidth = 85; // Maximum width in percentage
+            const iconOnlyThreshold = 25; // Below this width, show only icons
+
+            if (deltaX > 10) { // Swiping right (towards goal)
+              goalWidth = minWidth + (maxWidth - minWidth) * progress;
+              missWidth = 100 - goalWidth;
+            } else if (deltaX < -10) { // Swiping left (towards miss)
+              missWidth = minWidth + (maxWidth - minWidth) * progress;
+              goalWidth = 100 - missWidth;
+            } else {
+              // No significant swipe, return to normal
+              goalWidth = missWidth = 50;
+            }
+
+            // Apply widths directly
+            if (goalBtn && missBtn) {
+              goalBtn.style.width = goalWidth + '%';
+              missBtn.style.width = missWidth + '%';
+
+              // Toggle icon-only class based on width
+              if (goalWidth < iconOnlyThreshold) {
+                goalBtn.classList.add('icon-only');
+              } else {
+                goalBtn.classList.remove('icon-only');
+              }
+
+              if (missWidth < iconOnlyThreshold) {
+                missBtn.classList.add('icon-only');
+              } else {
+                missBtn.classList.remove('icon-only');
+              }
+            }
+          } else if (Math.abs(deltaY) > 10) {
+            // Vertical swipe - provide visual feedback
+            e.preventDefault();
+
+            // Reset horizontal button widths
+            if (goalBtn && missBtn) {
+              goalBtn.style.width = '';
+              missBtn.style.width = '';
+              goalBtn.classList.remove('icon-only');
+              missBtn.classList.remove('icon-only');
+            }
+
+            // Highlight appropriate button based on swipe direction
+            if (deltaY < 0) {
+              // Swiping up - highlight undo button
+              if (this.btnUndo) {
+                this.btnUndo.classList.add('swipe-highlight');
+              }
+              if (this.btnQuit) {
+                this.btnQuit.classList.remove('swipe-highlight');
+              }
+            } else {
+              // Swiping down - highlight quit button
+              if (this.btnQuit) {
+                this.btnQuit.classList.add('swipe-highlight');
+              }
+              if (this.btnUndo) {
+                this.btnUndo.classList.remove('swipe-highlight');
+              }
+            }
+          }
+        }, { passive: false });
+
+        this.gameControls.addEventListener('touchend', (e) => {
+          if (!isDown || gestureHandled) return;
+          isDown = false;
+
+          const endX = e.changedTouches[0].clientX;
+          const endY = e.changedTouches[0].clientY;
+          const deltaX = endX - startX;
+          const deltaY = endY - startY;
+
+          // Remove active swipe class to restore transitions
+          this.gameControls.classList.remove('swipe-active');
+
+          // Reset button widths
+          if (goalBtn && missBtn) {
+            goalBtn.style.width = '';
+            missBtn.style.width = '';
+            goalBtn.classList.remove('icon-only');
+            missBtn.classList.remove('icon-only');
+          }
+
+          // Reset button highlights
+          if (this.btnUndo) this.btnUndo.classList.remove('swipe-highlight');
+          if (this.btnQuit) this.btnQuit.classList.remove('swipe-highlight');
+
+          // Check for swipe gestures with minimum distance of 50px
+          if (Math.abs(deltaX) > 50 || Math.abs(deltaY) > 50) {
+            gestureHandled = true; // Prevent duplicate handling
+
+            // Determine primary swipe direction
+            if (Math.abs(deltaX) > Math.abs(deltaY)) {
+              // Horizontal swipe
+              if (deltaX > 0) {
+                // Swiped right
+                this.handleSwipeGesture('goal');
+              } else {
+                // Swiped left
+                this.handleSwipeGesture('miss');
+              }
+            } else {
+              // Vertical swipe
+              if (deltaY < 0) {
+                // Swiped up
+                this.handleSwipeGesture('undo');
+              } else {
+                // Swiped down
+                this.handleSwipeGesture('quit');
+              }
+            }
+          }
+        }, { passive: true });
+      }
+
+      handleSwipeGesture(action) {
+        // Execute the action after a brief delay for visual feedback
+        setTimeout(() => {
+          if (action === 'goal') {
+            this.onGoal();
+          } else if (action === 'miss') {
+            this.onMiss();
+          } else if (action === 'undo') {
+            this.onUndo();
+          } else if (action === 'quit') {
+            this.showQuitConfirmation();
+          }
+        }, 100);
+      }
+
+      // ----- Emoji Matrix Creation -----
+      createEmojiMatrix() {
+        // Create the matrix container
+        const matrix = document.createElement('div');
+        matrix.className = 'emoji-matrix';
+
+        // Create 8x8 grid of emojis (64 total)
+        for (let row = 0; row < 8; row++) {
+          for (let col = 0; col < 8; col++) {
+            const cell = document.createElement('div');
+            cell.className = 'emoji-cell';
+
+            // Alternating pattern: even positions get soccer ball, odd get donkey
+            const isEven = (row + col) % 2 === 0;
+            cell.textContent = isEven ? '⚽' : '🫏';
+
+            // Set CSS custom properties for staggered animation
+            cell.style.setProperty('--row', row);
+            cell.style.setProperty('--col', col);
+            cell.style.setProperty('--delay', (row + col) * 0.1);
+
+            matrix.appendChild(cell);
+          }
+        }
+
+        // Add matrix to document body
+        document.body.appendChild(matrix);
+      }
+
+      // ----- Game State Persistence -----
+      saveGameState() {
+        if (this.game && this.game.players && this.game.players.length > 0) {
+          const gameState = {
+            keyword: this.game.keyword,
+            allPlayers: this.game.allPlayers.map(p => ({ name: p.name, letters: p.letters })),
+            currentKicker: this.game.kicker ? this.game.kicker.name : null,
+            currentGoalkeeper: this.game.goalkeeper ? this.game.goalkeeper.name : null,
+            queuePlayers: this.game.queue.map(p => p.name),
+            currentPanel: 'game'
+          };
+          localStorage.setItem('aasi-game-state', JSON.stringify(gameState));
+        }
+      }
+
+      restoreGameState() {
+        const savedState = localStorage.getItem('aasi-game-state');
+        if (savedState) {
+          try {
+            const gameState = JSON.parse(savedState);
+
+            // Reconstruct the game
+            this.game = new Game();
+            this.game.keyword = gameState.keyword;
+
+            // Recreate all players with their letter progress
+            this.game.allPlayers = gameState.allPlayers.map(p => {
+              const player = new Player(p.name);
+              player.letters = p.letters;
+              return player;
+            });
+
+            // Find current players by name
+            this.game.kicker = this.game.allPlayers.find(p => p.name === gameState.currentKicker);
+            this.game.goalkeeper = this.game.allPlayers.find(p => p.name === gameState.currentGoalkeeper);
+            this.game.queue = gameState.queuePlayers.map(name =>
+              this.game.allPlayers.find(p => p.name === name)
+            ).filter(p => p); // Remove any null values
+
+            // Rebuild active players list
+            this.game.rebuildPlayersFromState();
+
+            // Show the game panel and render state
+            this.uiKeyword.textContent = this.game.keyword;
+            this.showPanel('game');
+            this.renderState();
+            this.updateUndoButtonState();
+
+          } catch (e) {
+            console.warn('Failed to restore game state:', e);
+            localStorage.removeItem('aasi-game-state');
+          }
+        }
+      }
+
+      clearGameState() {
+        localStorage.removeItem('aasi-game-state');
+      }
+
+      // ----- Setup stage -----
+      transformNameJ(name) {
+        // Take first 3 letters and add "kei"
+        const prefix = name.substring(0, 3);
+        return prefix + "kei";
+      }
+
+      shuffleArray(array) {
+        const shuffled = [...array];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
+      }
+
+      loadFromURL() {
+        const urlParams = new URLSearchParams(window.location.search);
+
+        // Load keyword
+        const keyword = urlParams.get('keyword');
+        if (keyword) {
+          document.getElementById('keyword').value = keyword;
+        }
+
+        // Load J-mode
+        const jMode = urlParams.get('j') === 'true' || urlParams.get('j') === '1';
+        document.getElementById('jMode').checked = jMode;
+
+        // Load players
+        const playersParam = urlParams.get('players');
+        if (playersParam) {
+          let playerNames = playersParam.split(',').map(name => decodeURIComponent(name.trim())).filter(name => name.length > 0);
+
+          // Check if shuffling is requested
+          const shouldShuffle = urlParams.get('shuffle') === 'true' || urlParams.get('shuffle') === '1';
+          if (shouldShuffle) {
+            playerNames = this.shuffleArray(playerNames);
+          }
+
+          // Add fields for each player from URL
+          playerNames.forEach(name => this.addPlayerField(name));
+
+          // Add one extra empty field
+          if (playerNames.length > 0) {
+            this.addPlayerField();
+          }
+        }
+
+        // If no players from URL, add default empty fields
+        if (!playersParam || this.playerFields.children.length === 0) {
+          this.addPlayerField();
+          this.addPlayerField();
+        }
+      }
+
+      updateURL() {
+        const names = this.collectPlayerNames();
+        const keyword = this.getKeywordFromSetup();
+        const jMode = document.getElementById('jMode').checked;
+
+        const urlParams = new URLSearchParams();
+        if (keyword && keyword !== 'AASI') {
+          urlParams.set('keyword', keyword);
+        }
+        if (names.length > 0) {
+          urlParams.set('players', names.map(name => encodeURIComponent(name)).join(','));
+        }
+        if (jMode) {
+          urlParams.set('j', '1');
+        }
+
+        const newURL = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
+        window.history.replaceState({}, '', newURL);
+      }
+
+      updateURLWithShuffle() {
+        const names = this.collectPlayerNames();
+        const keyword = this.getKeywordFromSetup();
+        const jMode = document.getElementById('jMode').checked;
+
+        const urlParams = new URLSearchParams();
+        if (keyword && keyword !== 'AASI') {
+          urlParams.set('keyword', keyword);
+        }
+        if (names.length > 0) {
+          urlParams.set('players', names.map(name => encodeURIComponent(name)).join(','));
+        }
+        if (jMode) {
+          urlParams.set('j', '1');
+        }
+        // Add shuffle flag
+        urlParams.set('shuffle', '1');
+
+        const newURL = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
+        window.history.replaceState({}, '', newURL);
+      }
+
+      addPlayerField(value = '') {
+        const idx = this.playerFields.children.length + 1;
+        const group = document.createElement('div');
+        group.className = 'input-group mb-2';
+
+        // Number span on the left
+        const span = document.createElement('span');
+        span.className = 'input-group-text';
+        span.textContent = idx.toString();
+
+        // Input field
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'form-control';
+        input.placeholder = 'Player name';
+        input.maxLength = 40;
+        input.value = value;
+
+        // Clear button on the right
+        const clearBtn = document.createElement('button');
+        clearBtn.type = 'button';
+        clearBtn.className = 'btn btn-outline-secondary';
+        clearBtn.innerHTML = '×';
+        clearBtn.title = 'Remove player';
+        clearBtn.addEventListener('click', () => {
+          group.remove();
+          this.renumberPlayerFields();
+        });
+
+        group.appendChild(span);
+        group.appendChild(input);
+        group.appendChild(clearBtn);
+        this.playerFields.appendChild(group);
+        input.focus();
+      }
+
+      renumberPlayerFields() {
+        // Update the numbering of all player fields after removal
+        const groups = this.playerFields.children;
+        for (let i = 0; i < groups.length; i++) {
+          const span = groups[i].querySelector('.input-group-text');
+          if (span) {
+            span.textContent = (i + 1).toString();
+          }
+        }
+
+        // Ensure we have at least two empty fields if all were removed
+        if (groups.length === 0) {
+          this.addPlayerField();
+          this.addPlayerField();
+        } else if (groups.length === 1) {
+          // Check if the remaining field is empty, if so add another empty field
+          const input = groups[0].querySelector('input');
+          if (!input || !input.value.trim()) {
+            this.addPlayerField();
+          }
+        }
+      }
+
+      getKeywordFromSetup() {
+        const kw = document.getElementById('keyword').value.trim();
+        return kw.length ? kw : 'AASI';
+      }
+
+      collectPlayerNames() {
+        const names = Array.from(this.playerFields.querySelectorAll('input'))
+          .map(input => input.value)
+          .map(s => s.replace(/\r?\n/g, '')) // sanitize newlines
+          .map(s => s.trim())
+          .filter(s => s.length > 0)
+          .map(s => s.slice(0, 40));
+        return names;
+      }
+
+      shufflePlayers() {
+        const names = this.collectPlayerNames();
+        if (names.length < 2) {
+          alert('Please enter at least two player names to shuffle.');
+          return;
+        }
+
+        const shuffledNames = this.shuffleArray(names);
+
+        // Clear existing fields
+        this.playerFields.innerHTML = '';
+
+        // Add shuffled names
+        shuffledNames.forEach(name => this.addPlayerField(name));
+
+        // Add one extra empty field
+        this.addPlayerField();
+
+        // Update URL with shuffle flag
+        this.updateURLWithShuffle();
+      }
+
+      startGame() {
+        const names = this.collectPlayerNames();
+        if (names.length < 2) {
+          alert('Please enter at least two player names.');
+          return;
+        }
+
+        // Check for duplicate names
+        const uniqueNames = [...new Set(names)];
+        if (uniqueNames.length !== names.length) {
+          alert('Please remove duplicate names.');
+          return;
+        }
+
+        const keyword = this.getKeywordFromSetup();
+        const jMode = document.getElementById('jMode').checked;
+
+        // Transform names if J-mode is enabled
+        const displayNames = jMode ? names.map(name => this.transformNameJ(name)) : names;
+
+        // Check for duplicates after J-mode transformation as well
+        const uniqueDisplayNames = [...new Set(displayNames)];
+        if (uniqueDisplayNames.length !== displayNames.length) {
+          alert('Player names would become duplicates after J-mode transformation. Please use different names.');
+          return;
+        }
+
+        // Update URL with current setup
+        this.updateURL();
+
+        this.game = new Game();
+        this.game.setup(keyword, displayNames);
+        this.uiKeyword.textContent = this.game.keyword;
+        this.previousGameState = null; // Reset undo state for new game
+        this.showPanel('game');
+        this.renderState();
+        this.updateUndoButtonState();
+
+        // Save initial game state
+        this.saveGameState();
+      }
+
+      // ----- Game stage -----
+      saveGameStateForUndo() {
+        // Create a deep copy of the current game state for undo
+        this.previousGameState = {
+          keyword: this.game.keyword,
+          allPlayers: this.game.allPlayers.map(p => ({ name: p.name, letters: p.letters })),
+          currentKicker: this.game.kicker ? this.game.kicker.name : null,
+          currentGoalkeeper: this.game.goalkeeper ? this.game.goalkeeper.name : null,
+          queuePlayers: this.game.queue.map(p => p.name)
+        };
+      }
+
+      onGoal() {
+        this.saveGameStateForUndo();
+        const result = this.game.goal();
+        if (result && result.type === 'end') {
+          this.showWinner(result.winner);
+          return;
+        }
+        this.renderState();
+        this.updateUndoButtonState();
+        this.saveGameState();
+      }
+
+      onMiss() {
+        this.saveGameStateForUndo();
+        const result = this.game.miss();
+        if (result && result.type === 'end') {
+          this.showWinner(result.winner);
+          return;
+        }
+        this.renderState();
+        this.updateUndoButtonState();
+        this.saveGameState();
+      }
+
+      onUndo() {
+        if (!this.previousGameState) return;
+
+        // Restore the previous game state
+        this.game = new Game();
+        this.game.keyword = this.previousGameState.keyword;
+
+        // Recreate all players with their previous letter progress
+        this.game.allPlayers = this.previousGameState.allPlayers.map(p => {
+          const player = new Player(p.name);
+          player.letters = p.letters;
+          return player;
+        });
+
+        // Find current players by name
+        this.game.kicker = this.game.allPlayers.find(p => p.name === this.previousGameState.currentKicker);
+        this.game.goalkeeper = this.game.allPlayers.find(p => p.name === this.previousGameState.currentGoalkeeper);
+        this.game.queue = this.previousGameState.queuePlayers.map(name =>
+          this.game.allPlayers.find(p => p.name === name)
+        ).filter(p => p); // Remove any null values
+
+        // Rebuild active players list
+        this.game.rebuildPlayersFromState();
+
+        // Clear the undo state since we've used it
+        this.previousGameState = null;
+
+        this.renderState();
+        this.updateUndoButtonState();
+        this.saveGameState();
+      }
+
+      updateUndoButtonState() {
+        if (this.btnUndo) {
+          this.btnUndo.disabled = !this.previousGameState;
+        }
+      }
+
+      renderState() {
+        // Roles
+        this.uiKicker.textContent = `${this.game.icons.kicker} ${this.game.kicker.name} (${this.game.statusFor(this.game.kicker)})`;
+        this.uiKeeper.textContent = `${this.game.icons.goalkeeper} ${this.game.goalkeeper.name} (${this.game.statusFor(this.game.goalkeeper)})`;
+
+        // Combined player display: kicker → queue → goalkeeper → eliminated
+        this.uiAllPlayers.innerHTML = '';
+
+        // 1. Kicker first
+        const kickerBadge = document.createElement('span');
+        kickerBadge.className = 'badge badge-kicker';
+        kickerBadge.textContent = `${this.game.icons.kicker} ${this.game.kicker.name} (${this.game.statusFor(this.game.kicker)})`;
+        this.uiAllPlayers.appendChild(kickerBadge);
+
+        // 2. Queue players
+        this.game.queue.forEach((p, i) => {
+          const badge = document.createElement('span');
+          badge.className = 'badge badge-queue';
+          badge.textContent = `${this.game.icons.queue} ${p.name} (${this.game.statusFor(p)})`;
+          this.uiAllPlayers.appendChild(badge);
+        });
+
+        // 3. Goalkeeper
+        const goalkeeperBadge = document.createElement('span');
+        goalkeeperBadge.className = 'badge badge-goalkeeper';
+        goalkeeperBadge.textContent = `${this.game.icons.goalkeeper} ${this.game.goalkeeper.name} (${this.game.statusFor(this.game.goalkeeper)})`;
+        this.uiAllPlayers.appendChild(goalkeeperBadge);
+
+        // 4. Eliminated players
+        const eliminatedPlayers = this.game.allPlayers.filter(p => this.game.isEliminated(p));
+        eliminatedPlayers.forEach(p => {
+          const badge = document.createElement('span');
+          badge.className = 'badge badge-eliminated';
+          badge.textContent = `🫏 ${p.name} (${this.game.statusFor(p)})`;
+          this.uiAllPlayers.appendChild(badge);
+        });
+
+        this.uiCount.textContent = this.game.players.length.toString();
+      }
+
+      showWinner(player) {
+        this.uiWinner.textContent = `Winner: ${player.name}`;
+        this.clearGameState();
+        this.showPanel('end');
+      }
+
+      showQuitConfirmation() {
+        // Show the confirmation modal
+        const modal = new bootstrap.Modal(document.getElementById('quitConfirmModal'));
+        modal.show();
+      }
+
+      quitGame() {
+        // Remove focus from the button first to avoid accessibility issues
+        this.confirmQuitBtn.blur();
+
+        // Dismiss the modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('quitConfirmModal'));
+        if (modal) {
+          modal.hide();
+        }
+
+        // End the game without declaring a winner
+        this.uiWinner.textContent = 'Game was quit';
+        this.clearGameState();
+        this.showPanel('end');
+      }
+
+      rematch() {
+        // Ask (lightweight) if they want to change keyword
+        //const newKw = prompt('Keyword for rematch:', this.game.keyword) ?? this.game.keyword;
+        this.game.restartSamePlayers();
+        this.uiKeyword.textContent = this.game.keyword;
+        this.previousGameState = null; // Reset undo state for rematch
+        this.showPanel('game');
+        this.renderState();
+        this.updateUndoButtonState();
+        this.saveGameState();
+      }
+
+      resetAll() {
+        // Clear setup inputs and return to setup
+        this.playerFields.innerHTML = '';
+        this.addPlayerField();
+        this.addPlayerField();
+        document.getElementById('keyword').value = 'AASI';
+        document.getElementById('jMode').checked = false;
+
+        // Clear URL parameters
+        window.history.replaceState({}, '', window.location.pathname);
+
+        this.showPanel('setup');
+      }
+
+      copyGameUrl() {
+        // Build URL with game parameters
+        const urlParams = new URLSearchParams();
+
+        // Use the original player names (before J-mode transformation)
+        const originalNames = this.game.allPlayers.map(p => {
+          // If this was a J-mode game, try to reverse the transformation
+          if (p.name.endsWith('kei') && p.name.length > 3) {
+            return p.name.slice(0, -3); // Remove "kei" suffix
+          }
+          return p.name;
+        });
+
+        if (this.game.keyword && this.game.keyword !== 'AASI') {
+          urlParams.set('keyword', this.game.keyword);
+        }
+        if (originalNames.length > 0) {
+          urlParams.set('players', originalNames.map(name => encodeURIComponent(name)).join(','));
+        }
+
+        const gameUrl = window.location.origin + window.location.pathname +
+                       (urlParams.toString() ? '?' + urlParams.toString() : '');
+
+        // Copy to clipboard
+        navigator.clipboard.writeText(gameUrl).then(() => {
+          // Provide visual feedback
+          const originalText = this.copyUrlBtn.textContent;
+          this.copyUrlBtn.textContent = 'Copied!';
+          this.copyUrlBtn.disabled = true;
+
+          setTimeout(() => {
+            this.copyUrlBtn.textContent = originalText;
+            this.copyUrlBtn.disabled = false;
+          }, 2000);
+        }).catch(err => {
+          console.error('Failed to copy URL:', err);
+          alert('Failed to copy URL to clipboard');
+        });
+      }
+
+      copySetupUrl() {
+        // Build URL with current setup parameters
+        const urlParams = new URLSearchParams();
+        const names = this.collectPlayerNames();
+        const keyword = this.getKeywordFromSetup();
+        const jMode = document.getElementById('jMode').checked;
+
+        if (keyword && keyword !== 'AASI') {
+          urlParams.set('keyword', keyword);
+        }
+        if (names.length > 0) {
+          urlParams.set('players', names.map(name => encodeURIComponent(name)).join(','));
+        }
+        if (jMode) {
+          urlParams.set('j', '1');
+        }
+
+        const setupUrl = window.location.origin + window.location.pathname +
+                        (urlParams.toString() ? '?' + urlParams.toString() : '');
+
+        // Copy to clipboard
+        navigator.clipboard.writeText(setupUrl).then(() => {
+          // Provide visual feedback
+          const originalText = this.copySetupBtn.textContent;
+          this.copySetupBtn.textContent = 'Copied!';
+          this.copySetupBtn.disabled = true;
+
+          setTimeout(() => {
+            this.copySetupBtn.textContent = originalText;
+            this.copySetupBtn.disabled = false;
+          }, 2000);
+        }).catch(err => {
+          console.error('Failed to copy URL:', err);
+          alert('Failed to copy URL to clipboard');
+        });
+      }
+
+      showPanel(which) {
+        this.setupPanel.classList.toggle('d-none', which !== 'setup');
+        this.gamePanel.classList.toggle('d-none', which !== 'game');
+        this.endPanel.classList.toggle('d-none', which !== 'end');
+
+        // Initialize swipe gestures when showing game panel
+        if (which === 'game') {
+          // Use setTimeout to ensure DOM is updated before initializing gestures
+          setTimeout(() => {
+            this.initializeNativeTouchGestures();
+          }, 100);
+        }
+      }
+    }
+
+    // Initialize app after DOM ready
+    document.addEventListener('DOMContentLoaded', () => {
+      new UIController();
+    });
+  </script>
+</body>
+</html>
