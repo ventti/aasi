@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Aasi</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover" />
+  <title>AASI</title>
   <!-- Favicon with donkey emoji -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🫏</text></svg>">
   <!-- Google Fonts -->
@@ -27,6 +27,11 @@
       font-size: 12px;
       line-height: 1.6;
       text-transform: uppercase;
+      /* Prevent iOS keyboard issues */
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+      -webkit-tap-highlight-color: transparent;
     }
     body {
       background: linear-gradient(135deg, #50ff50 0%, #40ff40 50%, #30ff30 100%);
@@ -47,8 +52,15 @@
           45deg,
           transparent,
           transparent 80px,
-          rgba(255, 255, 255, 0.1) 80px,
-          rgba(255, 255, 255, 0.1) 160px
+          rgba(0, 255, 0, 0.15) 80px,
+          rgba(0, 255, 0, 0.15) 160px
+        ),
+        repeating-linear-gradient(
+          -45deg,
+          transparent,
+          transparent 40px,
+          rgba(255, 255, 255, 0.05) 40px,
+          rgba(255, 255, 255, 0.05) 80px
         );
       z-index: -2;
       animation: moveBackground 40s linear infinite;
@@ -131,6 +143,8 @@
     .bg-overlay {
       background: var(--overlay);
       min-height: 100vh;
+      /* iOS viewport fixes */
+      min-height: -webkit-fill-available;
     }
     .card-glass {
       background: linear-gradient(175deg,
@@ -227,8 +241,6 @@
     }
     .btn-primary:hover, .btn-primary:focus, .btn-primary:active {
       background: linear-gradient(45deg, #0044cc, #002288) !important;
-      transform: translateY(-2px) !important;
-      box-shadow: 0 6px 12px rgba(51,102,255,0.4) !important;
       color: #fff !important;
     }
 
@@ -243,8 +255,6 @@
       background: linear-gradient(45deg, #3366ff, #0044cc) !important;
       border-color: #3366ff !important;
       color: #fff !important;
-      transform: translateY(-2px) !important;
-      box-shadow: 0 4px 8px rgba(51,102,255,0.3) !important;
     }
 
     .btn-secondary {
@@ -257,8 +267,6 @@
     }
     .btn-secondary:hover, .btn-secondary:focus, .btn-secondary:active {
       background: linear-gradient(45deg, #495057, #343a40) !important;
-      transform: translateY(-2px) !important;
-      box-shadow: 0 6px 12px rgba(108,117,125,0.4) !important;
       color: #fff !important;
     }
 
@@ -273,8 +281,6 @@
       background: linear-gradient(45deg, #6c757d, #495057) !important;
       border-color: #6c757d !important;
       color: #fff !important;
-      transform: translateY(-2px) !important;
-      box-shadow: 0 4px 8px rgba(108,117,125,0.3) !important;
     }
 
     /* Gamey button styles */
@@ -288,8 +294,6 @@
     }
     .btn-goal:hover {
       background: linear-gradient(45deg, #00cc33, #009922) !important;
-      transform: translateY(-2px) !important;
-      box-shadow: 0 6px 12px rgba(0,255,68,0.4) !important;
     }
 
     .btn-miss {
@@ -302,8 +306,6 @@
     }
     .btn-miss:hover {
       background: linear-gradient(45deg, #cc2233, #991122) !important;
-      transform: translateY(-2px) !important;
-      box-shadow: 0 6px 12px rgba(255,68,85,0.4) !important;
     }
 
     /* Modal content reverts to normal font */
@@ -444,6 +446,41 @@
 
     .table-striped tbody tr:nth-of-type(odd) {
       background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    /* iOS keyboard prevention and mobile fixes */
+    #gamePanel {
+      /* Prevent iOS keyboard from appearing */
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    #gamePanel * {
+      /* Prevent text selection and keyboard on all game elements */
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    /* Allow text selection only on setup panel inputs */
+    #setupPanel input {
+      -webkit-user-select: text;
+      user-select: text;
+      -webkit-touch-callout: default;
+    }
+
+    /* iOS viewport height fix */
+    @supports (-webkit-touch-callout: none) {
+      .bg-overlay {
+        min-height: -webkit-fill-available;
+      }
+    }
+
+    /* Prevent zoom on mobile when tapping buttons */
+    button, input[type="button"], input[type="submit"] {
+      touch-action: manipulation;
     }
   </style>
 </head>
