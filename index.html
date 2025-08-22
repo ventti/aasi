@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Aasi</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover" />
+  <title>AASI</title>
   <!-- Favicon with donkey emoji -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🫏</text></svg>">
   <!-- Google Fonts -->
@@ -27,6 +27,11 @@
       font-size: 12px;
       line-height: 1.6;
       text-transform: uppercase;
+      /* Prevent iOS keyboard issues */
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+      -webkit-tap-highlight-color: transparent;
     }
     body {
       background: linear-gradient(135deg, #50ff50 0%, #40ff40 50%, #30ff30 100%);
@@ -47,8 +52,15 @@
           45deg,
           transparent,
           transparent 80px,
-          rgba(255, 255, 255, 0.1) 80px,
-          rgba(255, 255, 255, 0.1) 160px
+          rgba(0, 255, 0, 0.15) 80px,
+          rgba(0, 255, 0, 0.15) 160px
+        ),
+        repeating-linear-gradient(
+          -45deg,
+          transparent,
+          transparent 40px,
+          rgba(255, 255, 255, 0.05) 40px,
+          rgba(255, 255, 255, 0.05) 80px
         );
       z-index: -2;
       animation: moveBackground 40s linear infinite;
@@ -131,6 +143,8 @@
     .bg-overlay {
       background: var(--overlay);
       min-height: 100vh;
+      /* iOS viewport fixes */
+      min-height: -webkit-fill-available;
     }
     .card-glass {
       background: linear-gradient(175deg,
@@ -187,24 +201,33 @@
       color: #000 !important;
       font-weight: bold;
       box-shadow: 0 2px 4px rgba(0,255,136,0.3);
+      font-size: 1.5em;
     }
     .badge-queue {
       background: linear-gradient(45deg, #3366ff, #0044cc) !important;
       color: #fff !important;
       font-weight: bold;
       box-shadow: 0 2px 4px rgba(51,102,255,0.3);
+      font-size: 1.5em;
     }
     .badge-goalkeeper {
       background: linear-gradient(45deg, #f4bc4b, #ff8800) !important;
       color: #000 !important;
       font-weight: bold;
       box-shadow: 0 2px 4px rgba(255,170,0,0.3);
+      font-size: 1.5em;
     }
     .badge-eliminated {
       background: linear-gradient(45deg, #ff3366, #cc0033) !important;
       color: #fff !important;
       font-weight: bold;
       box-shadow: 0 2px 4px rgba(255,51,102,0.3);
+      font-size: 1.5em;
+    }
+
+    /* Current shootout player names */
+    #uiKicker, #uiKeeper {
+      font-size: 1.5em;
     }
 
     /* Override Bootstrap colors with vibrant gamey colors */
@@ -218,8 +241,6 @@
     }
     .btn-primary:hover, .btn-primary:focus, .btn-primary:active {
       background: linear-gradient(45deg, #0044cc, #002288) !important;
-      transform: translateY(-2px) !important;
-      box-shadow: 0 6px 12px rgba(51,102,255,0.4) !important;
       color: #fff !important;
     }
 
@@ -234,8 +255,6 @@
       background: linear-gradient(45deg, #3366ff, #0044cc) !important;
       border-color: #3366ff !important;
       color: #fff !important;
-      transform: translateY(-2px) !important;
-      box-shadow: 0 4px 8px rgba(51,102,255,0.3) !important;
     }
 
     .btn-secondary {
@@ -248,8 +267,6 @@
     }
     .btn-secondary:hover, .btn-secondary:focus, .btn-secondary:active {
       background: linear-gradient(45deg, #495057, #343a40) !important;
-      transform: translateY(-2px) !important;
-      box-shadow: 0 6px 12px rgba(108,117,125,0.4) !important;
       color: #fff !important;
     }
 
@@ -264,8 +281,6 @@
       background: linear-gradient(45deg, #6c757d, #495057) !important;
       border-color: #6c757d !important;
       color: #fff !important;
-      transform: translateY(-2px) !important;
-      box-shadow: 0 4px 8px rgba(108,117,125,0.3) !important;
     }
 
     /* Gamey button styles */
@@ -279,8 +294,6 @@
     }
     .btn-goal:hover {
       background: linear-gradient(45deg, #00cc33, #009922) !important;
-      transform: translateY(-2px) !important;
-      box-shadow: 0 6px 12px rgba(0,255,68,0.4) !important;
     }
 
     .btn-miss {
@@ -293,8 +306,6 @@
     }
     .btn-miss:hover {
       background: linear-gradient(45deg, #cc2233, #991122) !important;
-      transform: translateY(-2px) !important;
-      box-shadow: 0 6px 12px rgba(255,68,85,0.4) !important;
     }
 
     /* Modal content reverts to normal font */
@@ -409,6 +420,68 @@
       transform: scale(2) !important;
       transition: all 0.1s ease !important;
     }
+
+    /* Statistics table styling */
+    .table-responsive {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 0.375rem;
+      padding: 1rem;
+      backdrop-filter: blur(4px);
+    }
+
+    .table {
+      color: inherit;
+      margin-bottom: 0;
+    }
+
+    .table th {
+      border-color: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.1);
+      font-weight: bold;
+    }
+
+    .table td {
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .table-striped tbody tr:nth-of-type(odd) {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    /* iOS keyboard prevention and mobile fixes */
+    #gamePanel {
+      /* Prevent iOS keyboard from appearing */
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    #gamePanel * {
+      /* Prevent text selection and keyboard on all game elements */
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    /* Allow text selection only on setup panel inputs */
+    #setupPanel input {
+      -webkit-user-select: text;
+      user-select: text;
+      -webkit-touch-callout: default;
+    }
+
+    /* iOS viewport height fix */
+    @supports (-webkit-touch-callout: none) {
+      .bg-overlay {
+        min-height: -webkit-fill-available;
+      }
+    }
+
+    /* Prevent zoom on mobile when tapping buttons */
+    button, input[type="button"], input[type="submit"] {
+      touch-action: manipulation;
+    }
   </style>
 </head>
 <body>
@@ -476,9 +549,9 @@
             <div class="col-12 col-lg-4">
               <div id="gameControls" class="p-3 border rounded-3 h-100 swipe-container">
                 <div class="small">Current shootout</div>
-                <div id="uiKicker" class="fs-4 fw-semibold"></div>
+                <div id="uiKicker" class="fw-semibold"></div>
                 vs.
-                <div id="uiKeeper" class="fs-4 fw-semibold"></div>
+                <div id="uiKeeper" class="fw-semibold"></div>
                 <div class="d-flex gap-1 mt-4">
                   <button id="btnGoal" class="btn btn-goal btn-lg flex-fill btn-swipe-goal" type="button">
                     <span class="btn-icon">⚽</span><span class="btn-text"> GOAL!</span>
@@ -618,9 +691,86 @@ as the name is changed.
   <script>
     // ---------- Data Model ----------
     class Player {
-      constructor(name) {
+      constructor(name, playerIndex = -1) {
         this.name = name;
         this.letters = 0; // how many letters collected as goalkeeper
+        this.color = this.generateColor(name, playerIndex); // unique color for this player
+        this.letterSources = []; // array of player names who scored goals against this player
+        this.stats = {
+          shotsAsTicker: 0,
+          goalsAsKicker: 0,
+          shotsAgainstAsGoalkeeper: 0,
+          savesAsGoalkeeper: 0
+        };
+      }
+
+      static getPredefinedColors() {
+        // Predefined palette of 8 distinct dark colors (darker than RGB 128,128,128)
+        return [
+          '#000000', // Black
+          '#8B0000', // Dark Red
+          '#006400', // Dark Green
+          '#000080', // Navy Blue
+          '#800080', // Purple
+          '#8B4513', // Saddle Brown
+          '#4F4F4F', // Dark Gray
+          '#8B8B00', // Dark Olive Green
+        ];
+      }
+
+      generateColor(name, playerIndex = -1) {
+        const predefinedColors = Player.getPredefinedColors();
+
+        // Use predefined color if player index is within range
+        if (playerIndex >= 0 && playerIndex < predefinedColors.length) {
+          return predefinedColors[playerIndex];
+        }
+
+        // Generate color for players beyond the predefined set
+        let hash = 0;
+        const nameWithEntropy = name + name.length.toString() + Math.floor(name.length / 2) + playerIndex.toString();
+        for (let i = 0; i < nameWithEntropy.length; i++) {
+          hash = nameWithEntropy.charCodeAt(i) + ((hash << 5) - hash);
+          hash = hash & hash; // Convert to 32-bit integer
+        }
+
+        // Additional hash mixing for better distribution
+        hash = Math.abs(hash);
+        const hue = (hash * 137.508) % 360; // Golden angle for better distribution
+        const saturation = 70 + (hash % 25); // 70-95% for vivid colors
+        const lightness = 25 + (hash % 15); // 25-40% to ensure darkness (well below 50% which corresponds to RGB 128)
+
+        return `hsl(${Math.floor(hue)}, ${Math.floor(saturation)}%, ${Math.floor(lightness)}%)`;
+      }
+
+      // Add method to get color for setup preview
+      static getColorForIndex(index, name = '') {
+        const predefinedColors = Player.getPredefinedColors();
+
+        // Use predefined color if index is within range
+        if (index >= 0 && index < predefinedColors.length) {
+          return predefinedColors[index];
+        }
+
+        // Generate color for indices beyond the predefined set
+        const tempPlayer = new Player(name || `Player${index + 1}`, index);
+        return tempPlayer.color;
+      }
+
+      addLetterFrom(shooterName) {
+        this.letters++;
+        this.letterSources.push(shooterName);
+      }
+
+      getLetterColors(keyword) {
+        // Return array of colors for each letter, based on who scored
+        const colors = [];
+        for (let i = 0; i < this.letters && i < keyword.length; i++) {
+          const shooterName = this.letterSources[i];
+          // Find the shooter's color (we'll need access to all players for this)
+          colors.push(shooterName);
+        }
+        return colors;
       }
     }
 
@@ -640,13 +790,54 @@ as the name is changed.
       };
       setup(keyword, names) {
         this.keyword = (keyword || "AASI").toString();
-        this.players = names.map(n => new Player(n));
+        this.players = names.map((n, index) => new Player(n, index));
+
+        // Ensure unique colors for all players
+        this.ensureUniqueColors();
+
         // Initial roles: first is kicker, last is goalkeeper, rest in between is queue
         if (this.players.length < 2) throw new Error("Need at least two players.");
         this.kicker = this.players[0];
         this.goalkeeper = this.players[this.players.length - 1];
         this.queue = this.players.slice(1, -1); // may be empty
         this.allPlayers = [...this.players]; // keep all players for reference
+      }
+
+      ensureUniqueColors() {
+        const usedColors = new Set();
+
+        for (let i = 0; i < this.players.length; i++) {
+          const player = this.players[i];
+          let attempts = 0;
+
+          // If color collision detected or too many attempts, regenerate
+          while (usedColors.has(player.color) && attempts < 50) {
+            // Add some entropy based on attempt number and player index
+            const entropy = player.name + attempts.toString() + i.toString();
+            player.color = this.generateUniqueColor(entropy, attempts);
+            attempts++;
+          }
+
+          usedColors.add(player.color);
+        }
+      }
+
+      generateUniqueColor(entropy, attempt = 0) {
+        // Enhanced color generation with more entropy
+        let hash = 0;
+        for (let i = 0; i < entropy.length; i++) {
+          hash = entropy.charCodeAt(i) + ((hash << 5) - hash);
+          hash = hash & hash; // Convert to 32-bit integer
+        }
+
+        // Add attempt-based variation
+        hash = Math.abs(hash + attempt * 1234567);
+
+        const hue = (hash * 137.508) % 360; // Golden angle for better distribution
+        const saturation = 70 + (hash % 25); // 70-95% for vivid colors
+        const lightness = 25 + (hash % 15); // 25-40% to ensure darkness
+
+        return `hsl(${Math.floor(hue)}, ${Math.floor(saturation)}%, ${Math.floor(lightness)}%)`;
       }
 
       // --- Helpers ---
@@ -667,6 +858,25 @@ as the name is changed.
         return filled + (rest > 0 ? "_".repeat(rest) : "");
       }
 
+      statusForWithColors(player) {
+        // Return HTML with colored letters based on who scored each goal
+        let html = '';
+        for (let i = 0; i < this.keyword.length; i++) {
+          if (i < player.letters && i < player.letterSources.length) {
+            const shooterName = player.letterSources[i];
+            const shooter = this.allPlayers.find(p => p.name === shooterName);
+            const color = shooter ? shooter.color : '#000';
+            html += `<span style="color: ${color}; font-weight: bold;">${this.keyword[i]}</span>`;
+          } else if (i < player.letters) {
+            // Fallback for any missing source data
+            html += this.keyword[i];
+          } else {
+            html += '_';
+          }
+        }
+        return html;
+      }
+
       isEliminated(player) {
         return player.letters >= this.keyword.length;
       }
@@ -680,8 +890,13 @@ as the name is changed.
 
       // --- Core transitions ---
       goal() {
+        // Record statistics
+        this.kicker.stats.shotsAsTicker++;
+        this.kicker.stats.goalsAsKicker++;
+        this.goalkeeper.stats.shotsAgainstAsGoalkeeper++;
+
         // Kicker scored -> GK gains 1 letter
-        this.goalkeeper.letters += 1;
+        this.goalkeeper.addLetterFrom(this.kicker.name);
 
         // Did that eliminate GK?
         if (this.isEliminated(this.goalkeeper)) {
@@ -715,6 +930,11 @@ as the name is changed.
       }
 
       miss() {
+        // Record statistics
+        this.kicker.stats.shotsAsTicker++;
+        this.goalkeeper.stats.shotsAgainstAsGoalkeeper++;
+        this.goalkeeper.stats.savesAsGoalkeeper++;
+
         // Miss -> GK released to end of queue
         this.queue.push(this.goalkeeper);
         // Current kicker becomes the new GK
@@ -738,8 +958,15 @@ as the name is changed.
       restartSamePlayers(newKeyword) {
         const names = this.allPlayers.map(p => p.name);
         this.keyword = newKeyword || this.keyword || "AASI";
-        this.players = names.map(n => new Player(n));
-        this.allPlayers = [...this.players]; // Reset allPlayers to the new Player objects
+
+        // Create completely new Player objects with fresh stats
+        this.players = names.map((n, index) => new Player(n, index));
+
+        // Ensure unique colors for restarted game
+        this.ensureUniqueColors();
+
+        // Reset allPlayers to the new Player objects (with fresh stats)
+        this.allPlayers = [...this.players];
         this.kicker = this.players[0];
         this.goalkeeper = this.players[this.players.length - 1];
         this.queue = this.players.slice(1, -1);
@@ -1034,7 +1261,13 @@ as the name is changed.
         if (this.game && this.game.players && this.game.players.length > 0) {
           const gameState = {
             keyword: this.game.keyword,
-            allPlayers: this.game.allPlayers.map(p => ({ name: p.name, letters: p.letters })),
+            allPlayers: this.game.allPlayers.map(p => ({
+              name: p.name,
+              letters: p.letters,
+              color: p.color,
+              letterSources: p.letterSources,
+              stats: p.stats
+            })),
             currentKicker: this.game.kicker ? this.game.kicker.name : null,
             currentGoalkeeper: this.game.goalkeeper ? this.game.goalkeeper.name : null,
             queuePlayers: this.game.queue.map(p => p.name),
@@ -1054,10 +1287,18 @@ as the name is changed.
             this.game = new Game();
             this.game.keyword = gameState.keyword;
 
-            // Recreate all players with their letter progress
-            this.game.allPlayers = gameState.allPlayers.map(p => {
-              const player = new Player(p.name);
-              player.letters = p.letters;
+            // Recreate all players with their state
+            this.game.allPlayers = gameState.allPlayers.map((p, index) => {
+              const player = new Player(p.name, index);
+              player.letters = p.letters || 0;
+              player.color = p.color || player.generateColor(p.name, index);
+              player.letterSources = p.letterSources || [];
+              player.stats = p.stats || {
+                shotsAsTicker: 0,
+                goalsAsKicker: 0,
+                shotsAgainstAsGoalkeeper: 0,
+                savesAsGoalkeeper: 0
+              };
               return player;
             });
 
@@ -1191,10 +1432,16 @@ as the name is changed.
         const group = document.createElement('div');
         group.className = 'input-group mb-2';
 
-        // Number span on the left
+        // Number span on the left with color background
         const span = document.createElement('span');
         span.className = 'input-group-text';
         span.textContent = idx.toString();
+
+        // Set background color based on player index
+        const playerColor = Player.getColorForIndex(idx - 1, value);
+        span.style.backgroundColor = playerColor;
+        span.style.color = '#ffffff'; // White text for contrast
+        span.style.fontWeight = 'bold';
 
         // Input field
         const input = document.createElement('input');
@@ -1203,6 +1450,12 @@ as the name is changed.
         input.placeholder = 'Player name';
         input.maxLength = 40;
         input.value = value;
+
+        // Update color when input changes
+        input.addEventListener('input', () => {
+          const newColor = Player.getColorForIndex(idx - 1, input.value);
+          span.style.backgroundColor = newColor;
+        });
 
         // Clear button on the right
         const clearBtn = document.createElement('button');
@@ -1227,8 +1480,25 @@ as the name is changed.
         const groups = this.playerFields.children;
         for (let i = 0; i < groups.length; i++) {
           const span = groups[i].querySelector('.input-group-text');
+          const input = groups[i].querySelector('input');
           if (span) {
             span.textContent = (i + 1).toString();
+            // Update background color for new index
+            const playerColor = Player.getColorForIndex(i, input ? input.value : '');
+            span.style.backgroundColor = playerColor;
+            span.style.color = '#ffffff';
+            span.style.fontWeight = 'bold';
+
+            // Update input event listener for new index
+            if (input) {
+              // Remove old listeners and add new one
+              const newInput = input.cloneNode(true);
+              newInput.addEventListener('input', () => {
+                const newColor = Player.getColorForIndex(i, newInput.value);
+                span.style.backgroundColor = newColor;
+              });
+              input.parentNode.replaceChild(newInput, input);
+            }
           }
         }
 
@@ -1329,7 +1599,13 @@ as the name is changed.
         // Create a deep copy of the current game state for undo
         this.previousGameState = {
           keyword: this.game.keyword,
-          allPlayers: this.game.allPlayers.map(p => ({ name: p.name, letters: p.letters })),
+          allPlayers: this.game.allPlayers.map(p => ({
+            name: p.name,
+            letters: p.letters,
+            color: p.color,
+            letterSources: [...p.letterSources],
+            stats: { ...p.stats }
+          })),
           currentKicker: this.game.kicker ? this.game.kicker.name : null,
           currentGoalkeeper: this.game.goalkeeper ? this.game.goalkeeper.name : null,
           queuePlayers: this.game.queue.map(p => p.name)
@@ -1367,10 +1643,13 @@ as the name is changed.
         this.game = new Game();
         this.game.keyword = this.previousGameState.keyword;
 
-        // Recreate all players with their previous letter progress
-        this.game.allPlayers = this.previousGameState.allPlayers.map(p => {
-          const player = new Player(p.name);
+        // Recreate all players with their previous state
+        this.game.allPlayers = this.previousGameState.allPlayers.map((p, index) => {
+          const player = new Player(p.name, index);
           player.letters = p.letters;
+          player.color = p.color;
+          player.letterSources = [...p.letterSources];
+          player.stats = { ...p.stats };
           return player;
         });
 
@@ -1400,8 +1679,8 @@ as the name is changed.
 
       renderState() {
         // Roles
-        this.uiKicker.textContent = `${this.game.icons.kicker} ${this.game.kicker.name} (${this.game.statusFor(this.game.kicker)})`;
-        this.uiKeeper.textContent = `${this.game.icons.goalkeeper} ${this.game.goalkeeper.name} (${this.game.statusFor(this.game.goalkeeper)})`;
+        this.uiKicker.innerHTML = `${this.game.icons.kicker} <span style="color: ${this.game.kicker.color}; font-weight: bold;">${this.game.kicker.name}</span> (${this.game.statusForWithColors(this.game.kicker)})`;
+        this.uiKeeper.innerHTML = `${this.game.icons.goalkeeper} <span style="color: ${this.game.goalkeeper.color}; font-weight: bold;">${this.game.goalkeeper.name}</span> (${this.game.statusForWithColors(this.game.goalkeeper)})`;
 
         // Combined player display: kicker → queue → goalkeeper → eliminated
         this.uiAllPlayers.innerHTML = '';
@@ -1409,21 +1688,21 @@ as the name is changed.
         // 1. Kicker first
         const kickerBadge = document.createElement('span');
         kickerBadge.className = 'badge badge-kicker';
-        kickerBadge.textContent = `${this.game.icons.kicker} ${this.game.kicker.name} (${this.game.statusFor(this.game.kicker)})`;
+        kickerBadge.innerHTML = `${this.game.icons.kicker} <span style="color: ${this.game.kicker.color}; font-weight: bold;">${this.game.kicker.name}</span> (${this.game.statusForWithColors(this.game.kicker)})`;
         this.uiAllPlayers.appendChild(kickerBadge);
 
         // 2. Queue players
         this.game.queue.forEach((p, i) => {
           const badge = document.createElement('span');
           badge.className = 'badge badge-queue';
-          badge.textContent = `${this.game.icons.queue} ${p.name} (${this.game.statusFor(p)})`;
+          badge.innerHTML = `${this.game.icons.queue} <span style="color: ${p.color}; font-weight: bold;">${p.name}</span> (${this.game.statusForWithColors(p)})`;
           this.uiAllPlayers.appendChild(badge);
         });
 
         // 3. Goalkeeper
         const goalkeeperBadge = document.createElement('span');
         goalkeeperBadge.className = 'badge badge-goalkeeper';
-        goalkeeperBadge.textContent = `${this.game.icons.goalkeeper} ${this.game.goalkeeper.name} (${this.game.statusFor(this.game.goalkeeper)})`;
+        goalkeeperBadge.innerHTML = `${this.game.icons.goalkeeper} <span style="color: ${this.game.goalkeeper.color}; font-weight: bold;">${this.game.goalkeeper.name}</span> (${this.game.statusForWithColors(this.game.goalkeeper)})`;
         this.uiAllPlayers.appendChild(goalkeeperBadge);
 
         // 4. Eliminated players
@@ -1431,7 +1710,7 @@ as the name is changed.
         eliminatedPlayers.forEach(p => {
           const badge = document.createElement('span');
           badge.className = 'badge badge-eliminated';
-          badge.textContent = `🫏 ${p.name} (${this.game.statusFor(p)})`;
+          badge.innerHTML = `🫏 <span style="color: ${p.color}; font-weight: bold;">${p.name}</span> (${this.game.statusForWithColors(p)})`;
           this.uiAllPlayers.appendChild(badge);
         });
 
@@ -1439,9 +1718,76 @@ as the name is changed.
       }
 
       showWinner(player) {
-        this.uiWinner.textContent = `Winner: ${player.name}`;
+        this.uiWinner.innerHTML = `Winner: <span style="color: ${player.color}; font-weight: bold;">${player.name}</span>`;
+        this.displayGameStatistics();
         this.clearGameState();
         this.showPanel('end');
+      }
+
+      displayGameStatistics() {
+        // Create statistics display
+        const statsContainer = document.createElement('div');
+        statsContainer.className = 'mt-4';
+        statsContainer.innerHTML = '<h5>Game Statistics</h5>';
+
+        const statsTable = document.createElement('div');
+        statsTable.className = 'table-responsive';
+
+        let tableHTML = `
+          <table class="table table-striped table-sm">
+            <thead>
+              <tr>
+                <th>Player</th>
+                <th>All Shots</th>
+                <th>Goals</th>
+                <th>Saves</th>
+                <th>Hit %</th>
+                <th>Save %</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+
+        this.game.allPlayers.forEach(player => {
+          const totalShots = player.stats.shotsAsTicker;
+          const goals = player.stats.goalsAsKicker;
+          const saves = player.stats.savesAsGoalkeeper;
+          const shotsAgainst = player.stats.shotsAgainstAsGoalkeeper;
+
+          const goalsPercent = totalShots > 0 ? Math.round((goals / totalShots) * 100) : 0;
+          const savesPercent = shotsAgainst > 0 ? Math.round((saves / shotsAgainst) * 100) : 0;
+
+          tableHTML += `
+            <tr>
+              <td><span style="color: ${player.color}; font-weight: bold;">${player.name}</span></td>
+              <td>${totalShots}</td>
+              <td>${goals}</td>
+              <td>${saves}</td>
+              <td>${goalsPercent}%</td>
+              <td>${savesPercent}%</td>
+              <td>${this.game.statusForWithColors(player)}</td>
+            </tr>
+          `;
+        });
+
+        tableHTML += '</tbody></table>';
+        statsTable.innerHTML = tableHTML;
+        statsContainer.appendChild(statsTable);
+
+        // Insert statistics right after the winner announcement
+        const endPanel = document.getElementById('endPanel');
+        const winnerText = endPanel.querySelector('.lead');
+        const buttonsDiv = endPanel.querySelector('.d-flex');
+
+        // Remove any existing stats
+        const existingStats = endPanel.querySelector('.mt-4');
+        if (existingStats && existingStats !== statsContainer) {
+          existingStats.remove();
+        }
+
+        // Insert after the winner text but before the buttons
+        winnerText.parentNode.insertBefore(statsContainer, winnerText.nextSibling);
       }
 
       showQuitConfirmation() {
@@ -1475,7 +1821,7 @@ as the name is changed.
         this.showPanel('game');
         this.renderState();
         this.updateUndoButtonState();
-        this.saveGameState();
+        this.saveGameState(); // Save the fresh game state with reset stats
       }
 
       resetAll() {
